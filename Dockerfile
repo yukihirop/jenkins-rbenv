@@ -1,18 +1,27 @@
+# [参考] https://hub.docker.com/r/csanchez/jenkins-mysql-docker/~/dockerfile/
+
 FROM jenkins:latest
 MAINTAINER Hiroshi Ota <otahi.pub@gmail.com>
 
 USER root
 RUN apt-get update
 
-# mysqlの環境構築
-RUN yum install -y yum-utils http://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm
-RUN yum-config-manager --disable mysql56-community
-RUN yum-config-manager --enable mysql55-community
-RUN yum install -y mysql-server mysql-community-devel  # mysql-community-develはmysql_configのため
 
-ADD my.cnf /etc/my.cnf
+####################################### mysqlの環境構築
 
-CMD ["/bin/sh"]
+# in order to create the jenkins db
+RUN apt-get update && apt-get -y install mysql-client
+
+# install mysql plugin and repackage war
+RUN curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database.hpi https://updates.jenkins-ci.org/latest/database.hpi \
+  && curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database-mysql.hpi https://updates.jenkins-ci.org/latest/database-mysql.hpi \
+  && cd /tmp && zip -g /usr/share/jenkins/jenkins.war WEB-INF/*/* && rm -rf /tmp/WEB-INF
+
+COPY ./jenkins-mysql.sh /usr/local/bin/jenkins-mysql.sh
+
+CMD ["/usr/local/bin/jenkins-mysql.sh"]
+
+####################################### rubyの環境構築
 
 RUN apt-get install -y ruby-build
 RUN groupadd ruby
