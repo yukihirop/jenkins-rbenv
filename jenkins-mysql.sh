@@ -25,20 +25,26 @@ EOF
 
 # 設定を読み込むさき defaults-extra-file
 cat << EOF | mysql --defaults-extra-file=$MYSQL_CONFIG
-CREATE DATABASE IF NOT EXISTS $DB_DATABASE;
 
-GRANT ALL PRIVILEGES ON $DATABASE.*
-TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'
-WITH GRANT OPTION;
+CREATE DATABASE IF NOT EXISTS $DB_DATABASE;
+GRANT ALL ON *.* TO $DB_USER@'%' IDENTIFIED BY '$DB_PASSWORD' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
 EOF
 
 rm -f $MYSQL_CONFIG
 
+
 while ! curl -vLo /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar 2>&1 | grep "Content-Type: application/java-archive" > /dev/null
 do
-    echo "Waiting for Jenkins to server jenkins-cli"
-    sleep 2
+  echo "Waiting for Jenkins to serve jenkins-cli"
+  sleep 2
 done
+
+
+echo "Configuring Jenkins for MySQL"
+
+cat << EOF | java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ groovy =
 
 import hudson.model.*;
 import hudson.util.*;
@@ -48,11 +54,11 @@ import org.jenkinsci.plugins.database.mysql.*;
 
 //db = hudson.model.Hudson.instance.pluginManager.getPlugin("database")
 
-config = Jenkins.getInstance().getDescriptor(GlobalDatabaseConfiguration.class)
-db = new MySQLDatabase("$DB_HOSTNAME:$DB_PORT", "$DB_DATABASE", "$DB_USER", Secret.fromString("$DB_PASSWORD"),"")
+config = Jenkins.getInstance().getDescriptor( GlobalDatabaseConfiguration.class )
+db = new MySQLDatabase("$DB_HOSTNAME:$DB_PORT", "$DB_DATABASE", "$DB_USER", Secret.fromString("$DB_PASSWORD"), "")
 config.setDatabase(db)
 
-println "Jenkins configured to use MySQL at $DB_USER@DB_HOSTNAME:$DB_PORT/$DB_DATABASE"
+println "Jenkins configured to use MySQL at $DB_USER@$DB_HOSTNAME:$DB_PORT/$DB_DATABASE"
 
 EOF
 
