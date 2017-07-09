@@ -4,6 +4,8 @@ FROM jenkins
 MAINTAINER Hiroshi Ota <otahi.pub@gmail.com>
 
 USER root
+RUN apt-get install zip
+RUN apt-get install unzip
 
 ####################################### mysqlの環境構築
 
