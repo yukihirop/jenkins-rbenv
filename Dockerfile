@@ -4,18 +4,17 @@ FROM jenkins
 MAINTAINER Hiroshi Ota <otahi.pub@gmail.com>
 
 USER root
-RUN apt-get install zip
-RUN apt-get install unzip
+RUN apt-get update
 
 ####################################### mysqlの環境構築
 
 # in order to create the jenkins db
-RUN apt-get update && apt-get -y install mysql-client
+RUN apt-get -y install mysql-client mysql-utilities
 
 # install mysql plugin and repackage war
 RUN curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database.hpi https://updates.jenkins-ci.org/latest/database.hpi \
   && curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database-mysql.hpi https://updates.jenkins-ci.org/latest/database-mysql.hpi \
-  && cd /tmp && zip -g /usr/share/jenkins/jenkins.war WEB-INF/*/* && rm -rf /tmp/WEB-INF
+  && cd /tmp && java -vxf -g /usr/share/jenkins/jenkins.war WEB-INF/*/* && rm -rf /tmp/WEB-INF
 
 COPY ./jenkins-mysql.sh /usr/local/bin/jenkins-mysql.sh
 
