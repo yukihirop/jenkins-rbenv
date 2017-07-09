@@ -38,6 +38,7 @@ rm -f $MYSQL_CONFIG
 while ! curl -vLo /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar 2>&1 | grep "Content-Type: application/java-archive" > /dev/null
 do
   echo "Waiting for Jenkins to serve jenkins-cli"
+  curl -vLo /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar
   sleep 2
 done
 
