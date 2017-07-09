@@ -1,11 +1,9 @@
 # [参考] https://hub.docker.com/r/csanchez/jenkins-mysql-docker/~/dockerfile/
 
-FROM jenkins:latest
+FROM jenkins
 MAINTAINER Hiroshi Ota <otahi.pub@gmail.com>
 
 USER root
-RUN apt-get update
-
 
 ####################################### mysqlの環境構築
 
