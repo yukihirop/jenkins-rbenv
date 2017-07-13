@@ -11,6 +11,8 @@ RUN apt-get update
 # in order to create the jenkins db
 RUN apt-get -y install mysql-client mysql-utilities
 # install mysql plugin and repackage war
+RUN sudo mkdir /usr/share/jenkins
+RUN sudo apt-get -y install openjdk-jdk
 RUN curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database.hpi https://updates.jenkins-ci.org/latest/database.hpi \
   && curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database-mysql.hpi https://updates.jenkins-ci.org/latest/database-mysql.hpi \
   && cd /tmp && jar cvf /usr/share/jenkins/jenkins.war WEB-INF/*/* && rm -rf /tmp/WEB-INF
