@@ -34,31 +34,32 @@ EOF
 
 rm -f $MYSQL_CONFIG
 
-while ! curl -vLo /var/jenkins_home/jenkins-cli.jar http://localhost:8888/jnlpJars/jenkins-cli.jar 2>&1 | grep "Content-Type: application/java-archive" > /dev/null
-do
-  echo "Waiting for Jenkins to serve jenkins-cli"
-  curl -vLo /var/jenkins_home/jenkins-cli.jar http://localhost:8888/jnlpJars/jenkins-cli.jar
-  sleep 2
-done
 
-echo "Configuring Jenkins for MySQL"
+#while ! curl -vLo /var/jenkins_home/jenkins-cli.jar http://localhost:8888/jnlpJars/jenkins-cli.jar 2>&1 | grep "Content-Type: application/java-archive" > /dev/null
+#do
+#  echo "Waiting for Jenkins to serve jenkins-cli"
+#  curl -vLo /var/jenkins_home/jenkins-cli.jar http://localhost:8888/jnlpJars/jenkins-cli.jar
+#  sleep 2
+#done
 
-cat << EOF | java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ groovy =
+#echo "Configuring Jenkins for MySQL"
 
-import hudson.model.*;
-import hudson.util.*;
-import jenkins.model.*;
-import org.jenkinsci.plugins.database.*;
-import org.jenkinsci.plugins.database.mysql.*;
+#cat << EOF | java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ groovy =
 
-//db = hudson.model.Hudson.instance.pluginManager.getPlugin("database")
+#import hudson.model.*;
+#import hudson.util.*;
+#import jenkins.model.*;
+#import org.jenkinsci.plugins.database.*;
+#import org.jenkinsci.plugins.database.mysql.*;
 
-config = Jenkins.getInstance().getDescriptor( GlobalDatabaseConfiguration.class )
-db = new MySQLDatabase("$DB_HOSTNAME:$DB_PORT", "$DB_DATABASE", "$DB_USER", Secret.fromString("$DB_PASSWORD"), "")
-config.setDatabase(db)
+#//db = hudson.model.Hudson.instance.pluginManager.getPlugin("database")
 
-println "Jenkins configured to use MySQL at $DB_USER@$DB_HOSTNAME:$DB_PORT/$DB_DATABASE"
+#config = Jenkins.getInstance().getDescriptor( GlobalDatabaseConfiguration.class )
+#db = new MySQLDatabase("$DB_HOSTNAME:$DB_PORT", "$DB_DATABASE", "$DB_USER", Secret.fromString("$DB_PASSWORD"), "")
+#config.setDatabase(db)
 
-EOF
+#println "Jenkins configured to use MySQL at $DB_USER@$DB_HOSTNAME:$DB_PORT/$DB_DATABASE"
+
+#EOF
 
 wait

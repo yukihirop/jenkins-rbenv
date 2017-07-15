@@ -9,17 +9,15 @@ RUN apt-get update
 ####################################### mysqlの環境構築
 
 # in order to create the jenkins db
-RUN apt-get -y install mysql-client mysql-utilities
+RUN apt-get -y install mysql-server libmysqlclient-dev
 # install mysql plugin and repackage war
-RUN sudo mkdir /usr/share/jenkins
-RUN sudo apt-get -y install openjdk-jdk
-RUN curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database.hpi https://updates.jenkins-ci.org/latest/database.hpi \
-  && curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database-mysql.hpi https://updates.jenkins-ci.org/latest/database-mysql.hpi \
-  && cd /tmp && jar cvf /usr/share/jenkins/jenkins.war WEB-INF/*/* && rm -rf /tmp/WEB-INF
+#RUN bin/mkdir -p /usr/share/jenkins
+#RUN curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database.hpi https://updates.jenkins-ci.org/latest/database.hpi \
+#  && curl -sSL --create-dirs -o /tmp/WEB-INF/plugins/database-mysql.hpi https://updates.jenkins-ci.org/latest/database-mysql.hpi \
+#  && cd /tmp && jar cvfm /usr/share/jenkins/jenkins.war META-INF/MANIFEST.MF WEB-INF/*/* && rm -rf /tmp/WEB-INF
 
 COPY ./jenkins-mysql.sh /usr/local/bin/jenkins-mysql.sh
 
-CMD ["/usr/local/bin/jenkins-mysql.sh"]
 
 ####################################### rubyの環境構築
 
@@ -48,5 +46,6 @@ USER jenkins
 COPY plugins.txt /plugins.txt
 RUN  plugins.sh /plugins.txt
 
+EXPOSE 8888
 WORKDIR $JENKINS_HOME
-ENTRYPOINT ["/usr/local/bin/jenkins.sh"]
+ENTRYPOINT ["/usr/local/bin/jenkins-mysql.sh"]
